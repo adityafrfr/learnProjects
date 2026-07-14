@@ -11,6 +11,7 @@ func pingHandler(w http.ResponseWriter, r *http.Request)	{
 
 	response := "all ok"
 	w.Write([]byte(response))
+}
 
 // 		response := map[string]string{
 // 		"status": "all ok",
@@ -20,4 +21,4 @@ func pingHandler(w http.ResponseWriter, r *http.Request)	{
 // 		log.Printf("failed to encode response: %v", err)
 // 	}
 // }
-}
+
