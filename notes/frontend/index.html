@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes API Tester</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #222; padding: 2rem; }
+h1 { margin-bottom: 1rem; }
+section { background: #fff; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+h2 { font-size: 1.1rem; margin-bottom: .75rem; }
+button { background: #0066cc; color: #fff; border: none; padding: .5rem 1rem; border-radius: 6px; cursor: pointer; font-size: .9rem; }
+button:hover { background: #0052a3; }
+pre { background: #f0f0f0; padding: .75rem; border-radius: 6px; overflow-x: auto; font-size: .85rem; margin-top: .75rem; }
+input, textarea { width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: 6px; font-size: .9rem; margin-bottom: .5rem; font-family: inherit; }
+textarea { resize: vertical; min-height: 60px; }
+.row { display: flex; gap: .5rem; }
+.row input { flex: 1; }
+td, th { padding: .5rem; text-align: left; border-bottom: 1px solid #eee; }
+th { font-weight: 600; }
+.badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 12px; font-size: .8rem; }
+</style>
+</head>
+<body>
+<h1> Notes API</h1>
+
+<section>
+  <h2> Health Check</h2>
+  <button onclick="ping()">GET /ping</button>
+  <pre id="pingResult">—</pre>
+</section>
+
+<section>
+  <h2> Create Note</h2>
+  <div class="row">
+    <input id="titleInput" placeholder="Title">
+    <input id="contentInput" placeholder="Content">
+  </div>
+  <button onclick="createNote()">POST /notes</button>
+  <pre id="createResult">—</pre>
+</section>
+
+<section>
+  <h2> All Notes</h2>
+  <button onclick="getNotes()">GET /notes</button>
+  <pre id="notesResult">—</pre>
+</section>
+
+<script>
+const API = 'http://localhost:8080';
+
+async function ping() {
+  const pre = document.getElementById('pingResult');
+  try {
+    const r = await fetch(API + '/ping');
+    pre.textContent = await r.text();
+  } catch (e) { pre.textContent = 'Error: ' + e.message; }
+}
+
+async function createNote() {
+  const pre = document.getElementById('createResult');
+  const title = document.getElementById('titleInput').value;
+  const content = document.getElementById('contentInput').value;
+  if (!title || !content) { pre.textContent = 'Fill in both fields'; return; }
+  try {
+    const r = await fetch(API + '/notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content })
+    });
+    const data = await r.json();
+    pre.textContent = JSON.stringify(data, null, 2);
+  } catch (e) { pre.textContent = 'Error: ' + e.message; }
+}
+
+async function getNotes() {
+  const pre = document.getElementById('notesResult');
+  try {
+    const r = await fetch(API + '/notes');
+    const data = await r.json();
+    pre.textContent = data.length === 0 ? '[] (no notes yet)' : JSON.stringify(data, null, 2);
+  } catch (e) { pre.textContent = 'Error: ' + e.message; }
+}
+</script>
+</body>
+</html>
