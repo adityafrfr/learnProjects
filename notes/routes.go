@@ -19,6 +19,7 @@ func cors(next http.Handler) http.Handler {
 
 func init() {
 	mux.HandleFunc("GET /ping", PingHandler)
-	mux.HandleFunc("GET /notes", GetNoteHandler)
-	mux.HandleFunc("POST /notes", CreateNotesHandler)
+	mux.HandleFunc("GET /notes", GetAllNotesHandler)
+	mux.HandleFunc("POST /notes", CreateNoteHandler)
+	mux.HandleFunc("POST /notes/{id}", GetNoteByIDHandler)
 }

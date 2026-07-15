@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"sync"
+
 	"time"
 
 	"github.com/google/uuid"
@@ -41,12 +43,27 @@ func (n *NoteStore) Create(noteObject CreateNoteRequest) Note {
 	return note
 }
 
-func (n NoteStore) Read() []Note	{
+func (n *NoteStore) Read() []Note {
 
+	n.mu.RLock()
+	defer n.mu.RUnlock()
 	var result []Note
-	for _, note := range n.notes{
+	for _, note := range n.notes {
 		result = append(result, note)
 	}
 
 	return result
+}
+
+func (n *NoteStore) ReadById(id string) (Note, error) {
+
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	note, ok := n.notes[id]
+
+	if !ok {
+		return Note{}, fmt.Errorf("Note with uuid %v not found", id)
+	}
+
+	return note, nil
 }

@@ -14,7 +14,7 @@ func PingHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(response))
 }
 
-func GetNoteHandler(w http.ResponseWriter, r *http.Request) {
+func GetAllNotesHandler(w http.ResponseWriter, r *http.Request) {
 
 	notes := publicNotes.Read()
 
@@ -22,15 +22,13 @@ func GetNoteHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(notes)
 
-
 }
 
-
-func CreateNotesHandler(w http.ResponseWriter, r *http.Request) {
+func CreateNoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	var req CreateNoteRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil	{
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Printf("cannot create note with %v %q", r.Body, err)
 
 		http.Error(w, "cant create the note", http.StatusBadRequest)
@@ -42,6 +40,23 @@ func CreateNotesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newNote)
+}
+
+func GetNoteByIDHandler(w http.ResponseWriter, r *http.Request) {
+	var id = r.PathValue("id")
+
+	note, err := publicNotes.ReadById(id)
+
+	if err != nil {
+		log.Printf("Error reading %v id  %v", id, err)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(note)
 }
 
 // 		response := map[string]string{
